@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, ConfigDict
 
 
 class UserBootstrapRequest(BaseModel):
@@ -14,8 +14,7 @@ class UserResponse(BaseModel):
     full_name: str
     avatar_image_url: str | None = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ClothingItemResponse(BaseModel):
