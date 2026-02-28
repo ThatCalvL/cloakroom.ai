@@ -1,2 +1,12 @@
 # Google App Engine generated folder
 appengine-generated/
+__pycache__/
+*.pyc
+.venv/
+.env
+
+# Local runtime artifacts
+backend/uploads/
+uploads/
+*.db
+test_cloakroom.db
