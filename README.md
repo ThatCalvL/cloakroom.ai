@@ -8,6 +8,7 @@ This repository includes:
 - `backend/`: FastAPI backend for upload, categorization, closet inventory, and virtual try-on orchestration.
 - `ios/`: SwiftUI app scaffold for capture flow, digital closet, styling carousel, and try-on result display.
 - `docs/plans.md`: Product and implementation plan.
+- `docs/mvp-credentials-setup.md`: Centralized credentials setup for MVP.
 
 ## Implemented Features
 
