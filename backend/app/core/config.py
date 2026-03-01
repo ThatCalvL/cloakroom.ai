@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     VTON_API_KEY: str | None = None
     ENABLE_MOCK_VTON: bool = True
     VTON_MODEL_VERSION: str = "replace-with-provider-model-version"
+    CORS_ALLOW_ORIGINS: str = "http://localhost:3000,http://127.0.0.1:3000"
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

@@ -30,6 +30,7 @@ Set these in `backend/.env`:
 PROJECT_NAME=Cloakroom.ai API
 DATABASE_URL=sqlite:///./cloakroom.db
 STATIC_BASE_URL=http://127.0.0.1:8000
+CORS_ALLOW_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
 ENABLE_MOCK_VTON=true
 VTON_API_URL=https://api.replicate.com/v1/predictions
 VTON_API_KEY=
@@ -49,6 +50,7 @@ In this local mode:
 
 - `DATABASE_URL`: SQL database connection string.
 - `STATIC_BASE_URL`: Public base URL used to build image URLs (must match your running backend URL).
+- `CORS_ALLOW_ORIGINS`: Comma-separated web origins allowed to call backend APIs from browser.
 - `ENABLE_MOCK_VTON`: `true` means fake try-on image is returned (fast MVP mode).
 - `VTON_API_URL`: VTON provider endpoint.
 - `VTON_API_KEY`: Bearer token for VTON provider.
