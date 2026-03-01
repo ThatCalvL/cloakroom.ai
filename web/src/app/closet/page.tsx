@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ItemCard } from "@/components/ItemCard";
 import { EmptyState } from "@/components/EmptyState";
 import { StatusMessage } from "@/components/StatusMessage";
-import { fetchCloset } from "@/lib/api";
+import { addItemPhotos, fetchCloset, updateItemName } from "@/lib/api";
 import { getOrBootstrapOwnerId } from "@/lib/session";
 import type { Category, ClothingItem } from "@/lib/types";
 
@@ -23,7 +23,9 @@ export default function ClosetPage(): React.JSX.Element {
   const [items, setItems] = useState<ClothingItem[]>([]);
   const [filter, setFilter] = useState<Category | "all">("all");
   const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   useEffect(() => {
     let mounted = true;
@@ -50,7 +52,9 @@ export default function ClosetPage(): React.JSX.Element {
 
   async function loadItems(id: number, mounted = true): Promise<void> {
     setLoading(true);
-    setError("");
+    if (mounted) {
+      setError("");
+    }
     try {
       const payload = await fetchCloset(id);
       if (mounted) {
@@ -64,6 +68,39 @@ export default function ClosetPage(): React.JSX.Element {
       if (mounted) {
         setLoading(false);
       }
+    }
+  }
+
+  async function handleRename(itemId: number, name: string): Promise<void> {
+    setEditing(true);
+    setError("");
+    setSuccess("");
+    try {
+      await updateItemName(itemId, name);
+      setItems((prev) => prev.map((item) => (item.id === itemId ? { ...item, name } : item)));
+      setSuccess("Item name updated.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update item name.");
+    } finally {
+      setEditing(false);
+    }
+  }
+
+  async function handleAddPhotos(itemId: number, files: FileList, angleLabel?: string): Promise<void> {
+    if (!ownerId) {
+      return;
+    }
+    setEditing(true);
+    setError("");
+    setSuccess("");
+    try {
+      const updatedItem = await addItemPhotos(itemId, files, angleLabel);
+      setItems((prev) => prev.map((item) => (item.id === itemId ? updatedItem : item)));
+      setSuccess(`${files.length} photo(s) added to item #${itemId}.`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to add angle photos.");
+    } finally {
+      setEditing(false);
     }
   }
 
@@ -90,6 +127,7 @@ export default function ClosetPage(): React.JSX.Element {
             Go to Styling
           </Link>
         </div>
+        <StatusMessage message={success} tone="success" />
         <StatusMessage message={error} tone="error" />
       </div>
 
@@ -119,7 +157,13 @@ export default function ClosetPage(): React.JSX.Element {
         ) : (
           <div className="item-grid">
             {visibleItems.map((item) => (
-              <ItemCard key={item.id} item={item} />
+              <ItemCard
+                key={item.id}
+                item={item}
+                disabled={editing}
+                onRename={handleRename}
+                onAddPhotos={handleAddPhotos}
+              />
             ))}
           </div>
         )}

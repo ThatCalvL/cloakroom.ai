@@ -85,7 +85,7 @@ If you use Replicate for VTON:
 3. Put token into `VTON_API_KEY`
 4. Set `VTON_API_URL=https://api.replicate.com/v1/predictions`
 5. Copy your selected model version hash into `VTON_MODEL_VERSION`
-6. Set `ENABLE_MOCK_VTON=false`
+6. Set `https://api.replicate.com/v1/predictions`
 
 If you use RunPod/Modal/Baseten:
 

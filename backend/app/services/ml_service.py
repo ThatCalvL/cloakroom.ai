@@ -1,13 +1,30 @@
 import io
-from PIL import Image
+
+import pillow_heif
+from PIL import Image, UnidentifiedImageError
 from rembg import remove
+
+# Register HEIF/HEIC opener so uploads from Apple devices decode correctly.
+pillow_heif.register_heif_opener()
+
+
+class InvalidImageError(ValueError):
+    """Raised when uploaded bytes are not a supported image format."""
+
 
 def remove_background(image_bytes: bytes) -> bytes:
     """
     Takes an image in bytes, removes the background using rembg,
     and returns the processed image as bytes (PNG format).
     """
-    input_image = Image.open(io.BytesIO(image_bytes))
+    try:
+        input_image = Image.open(io.BytesIO(image_bytes))
+        input_image.load()
+    except UnidentifiedImageError as exc:
+        raise InvalidImageError(
+            "Unsupported image format. Please upload a valid JPG, PNG, or WEBP file."
+        ) from exc
+
     try:
         output_image = remove(input_image)
     except Exception:

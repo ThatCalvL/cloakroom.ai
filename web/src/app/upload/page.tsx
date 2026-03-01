@@ -10,6 +10,7 @@ import type { UploadResponse } from "@/lib/types";
 export default function UploadPage(): React.JSX.Element {
   const [ownerId, setOwnerId] = useState<number | null>(null);
   const [file, setFile] = useState<File | null>(null);
+  const [itemName, setItemName] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
@@ -53,6 +54,10 @@ export default function UploadPage(): React.JSX.Element {
   function handleChange(event: ChangeEvent<HTMLInputElement>): void {
     const selected = event.target.files?.[0];
     setFile(selected ?? null);
+    if (selected && !itemName.trim()) {
+      const filenameWithoutExt = selected.name.replace(/\.[^/.]+$/, "");
+      setItemName(filenameWithoutExt);
+    }
     setError("");
     setSuccess("");
   }
@@ -67,10 +72,11 @@ export default function UploadPage(): React.JSX.Element {
     setSuccess("");
 
     try {
-      const payload = await uploadItem(ownerId, file);
+      const payload = await uploadItem(ownerId, file, itemName);
       setLastUpload(payload);
       setSuccess(payload.message);
       setFile(null);
+      setItemName("");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed.");
     } finally {
@@ -83,13 +89,22 @@ export default function UploadPage(): React.JSX.Element {
       <div className="card stack">
         <h2 className="title">Upload Clothing</h2>
         <p className="subtitle">
-          Add one clothing item photo at a time. The backend removes background and auto-categorizes
-          each item.
+          Add one clothing item photo at a time. You can rename the item now and add more angle photos from
+          the closet page.
         </p>
         <p className="subtitle">Active owner ID: {ownerId ?? "loading..."}</p>
       </div>
 
       <div className="card stack">
+        <label htmlFor="item-name">Item name</label>
+        <input
+          id="item-name"
+          className="input"
+          placeholder="e.g. Black oversized hoodie"
+          value={itemName}
+          onChange={(event) => setItemName(event.target.value)}
+        />
+
         <label htmlFor="item-upload">Choose image</label>
         <input id="item-upload" className="input" type="file" accept="image/*" onChange={handleChange} />
 
@@ -115,8 +130,10 @@ export default function UploadPage(): React.JSX.Element {
       {lastUpload ? (
         <div className="card stack">
           <h3>Last Upload</h3>
+          <p>Name: {lastUpload.item.name ?? "Untitled item"}</p>
           <p>Item ID: {lastUpload.item.id}</p>
           <p>Category: {lastUpload.item.category}</p>
+          <p>Angles stored: {lastUpload.item.photos.length}</p>
           <p>Processed URL: {lastUpload.item.processed_url}</p>
         </div>
       ) : null}

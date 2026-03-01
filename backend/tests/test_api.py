@@ -2,6 +2,7 @@ import io
 import os
 import sys
 from pathlib import Path
+
 from PIL import Image
 from fastapi.testclient import TestClient
 
@@ -44,20 +45,40 @@ def test_bootstrap_upload_closet_tryon_flow():
     image_bytes = _sample_image_bytes()
     upload = client.post(
         "/api/upload/",
-        data={"owner_id": str(user_id)},
+        data={"owner_id": str(user_id), "item_name": "Black Hoodie"},
         files={"file": ("item.jpg", image_bytes, "image/jpeg")},
     )
     assert upload.status_code == 200, upload.text
     upload_payload = upload.json()
     item = upload_payload["item"]
     assert item["owner_id"] == user_id
+    assert item["name"] == "Black Hoodie"
     assert item["processed_url"].startswith("/static/")
     assert item["category"] in {"top", "bottom", "outerwear", "shoes", "accessory"}
+    assert len(item["photos"]) == 1
+
+    add_photo = client.post(
+        f"/api/items/{item['id']}/photos",
+        files=[("files", ("angle2.jpg", image_bytes, "image/jpeg"))],
+        data={"angle_label": "side"},
+    )
+    assert add_photo.status_code == 200, add_photo.text
+    updated_item = add_photo.json()
+    assert len(updated_item["photos"]) == 2
+
+    rename = client.patch(
+        f"/api/items/{item['id']}",
+        json={"name": "Black Hoodie - Oversized"},
+    )
+    assert rename.status_code == 200, rename.text
+    assert rename.json()["name"] == "Black Hoodie - Oversized"
 
     closet = client.get(f"/api/closet/{user_id}")
     assert closet.status_code == 200
     closet_items = closet.json()
     assert len(closet_items) >= 1
+    assert closet_items[0]["name"] == "Black Hoodie - Oversized"
+    assert len(closet_items[0]["photos"]) >= 2
 
     tryon = client.post(
         "/api/tryon/",

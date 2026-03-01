@@ -7,14 +7,25 @@ export interface UserResponse {
   avatar_image_url: string | null;
 }
 
+export interface ClothingItemPhoto {
+  id: number;
+  item_id: number;
+  original_url: string | null;
+  processed_url: string;
+  angle_label: string | null;
+  created_at: string;
+}
+
 export interface ClothingItem {
   id: number;
   owner_id: number;
+  name: string | null;
   original_url: string | null;
   processed_url: string;
   category: Category;
   color: string | null;
   created_at: string;
+  photos: ClothingItemPhoto[];
 }
 
 export interface UploadResponse {

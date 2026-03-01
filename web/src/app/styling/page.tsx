@@ -108,7 +108,7 @@ export default function StylingPage(): React.JSX.Element {
           <option value="">None</option>
           {options.map((item) => (
             <option key={item.id} value={item.id}>
-              #{item.id} {item.category}
+              #{item.id} {item.name ?? item.category}
             </option>
           ))}
         </select>
@@ -167,6 +167,7 @@ export default function StylingPage(): React.JSX.Element {
             alt="Generated try-on result"
             width={420}
             height={620}
+            unoptimized
           />
           <a className="button secondary" href={toAssetUrl(resultUrl)} target="_blank" rel="noreferrer">
             Open Image

@@ -70,10 +70,13 @@ export async function bootstrapUser(
   });
 }
 
-export async function uploadItem(ownerId: number, file: File): Promise<UploadResponse> {
+export async function uploadItem(ownerId: number, file: File, itemName?: string): Promise<UploadResponse> {
   const formData = new FormData();
   formData.append("owner_id", String(ownerId));
   formData.append("file", file);
+  if (itemName && itemName.trim()) {
+    formData.append("item_name", itemName.trim());
+  }
 
   return apiRequest<UploadResponse>("/api/upload/", {
     method: "POST",
@@ -83,6 +86,34 @@ export async function uploadItem(ownerId: number, file: File): Promise<UploadRes
 
 export async function fetchCloset(ownerId: number): Promise<ClothingItem[]> {
   return apiRequest<ClothingItem[]>(`/api/closet/${ownerId}`);
+}
+
+export async function updateItemName(itemId: number, name: string): Promise<ClothingItem> {
+  return apiRequest<ClothingItem>(`/api/items/${itemId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name }),
+  });
+}
+
+export async function addItemPhotos(
+  itemId: number,
+  files: FileList | File[],
+  angleLabel?: string,
+): Promise<ClothingItem> {
+  const formData = new FormData();
+  const normalizedFiles = Array.from(files);
+  for (const file of normalizedFiles) {
+    formData.append("files", file);
+  }
+  if (angleLabel && angleLabel.trim()) {
+    formData.append("angle_label", angleLabel.trim());
+  }
+
+  return apiRequest<ClothingItem>(`/api/items/${itemId}/photos`, {
+    method: "POST",
+    body: formData,
+  });
 }
 
 export async function generateTryOn(payload: TryOnRequest): Promise<TryOnResponse> {

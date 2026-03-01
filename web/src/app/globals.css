@@ -209,6 +209,21 @@ a {
   font-size: 0.84rem;
 }
 
+.angles-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.angle-image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #f2f4f8;
+}
+
 .chip-group {
   display: flex;
   flex-wrap: wrap;
